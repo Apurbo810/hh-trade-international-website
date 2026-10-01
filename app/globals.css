@@ -5,6 +5,7 @@
     --color-brand-dark: #E67E00;
     --color-brand-light: #FFF7ED;
     --color-brand-soft: #FFEDD5;
+    --font-sans: "Outfit Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 @layer components {
@@ -19,6 +20,10 @@
 }
 
 @layer base {
+    body {
+        font-family: var(--font-sans);
+    }
+
     button {
         cursor: pointer;
     }
