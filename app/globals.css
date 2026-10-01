@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+    --color-brand: #F7941D;
+    --color-brand-dark: #E67E00;
+    --color-brand-light: #FFF7ED;
+    --color-brand-soft: #FFEDD5;
+}
+
+@layer components {
+    @keyframes marqueeScroll {
+        0% {
+            transform: translateX(0%);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+}
+
+@layer base {
+    button {
+        cursor: pointer;
+    }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+    pointer-events: none;
+}

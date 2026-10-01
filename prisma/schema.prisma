@@ -1,0 +1,152 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+
+// =========================
+// USER
+// =========================
+
+model User {
+    id        String   @id
+    name      String
+    email     String   @unique
+    image     String?
+    cart      Json     @default("{}")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    ratings     Rating[]
+    addresses   Address[]
+    orders      Order[]
+}
+
+
+// =========================
+// PRODUCT
+// =========================
+
+model Product {
+    id          String   @id @default(cuid())
+    name        String
+    description String
+    mrp         Float
+    price       Float
+    images      String[]
+    category    String
+    inStock     Boolean  @default(true)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    orderItems OrderItem[]
+    ratings    Rating[]
+}
+
+
+// =========================
+// ORDER
+// =========================
+
+enum OrderStatus {
+    ORDER_PLACED
+    PROCESSING
+    SHIPPED
+    DELIVERED
+    CANCELLED
+}
+
+
+enum PaymentMethod {
+    COD
+    STRIPE
+}
+
+
+model Order {
+    id            String        @id @default(cuid())
+    total         Float
+    status        OrderStatus   @default(ORDER_PLACED)
+
+    userId        String
+    addressId     String
+
+    isPaid        Boolean       @default(false)
+    paymentMethod PaymentMethod
+
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+
+    orderItems    OrderItem[]
+
+    user          User          @relation(fields: [userId], references: [id])
+    address       Address       @relation(fields: [addressId], references: [id])
+}
+
+
+// =========================
+// ORDER ITEM
+// =========================
+
+model OrderItem {
+    orderId   String
+    productId String
+    quantity  Int
+    price     Float
+
+    order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product   Product @relation(fields: [productId], references: [id])
+
+    @@id([orderId, productId])
+}
+
+
+// =========================
+// PRODUCT RATING
+// =========================
+
+model Rating {
+    id        String   @id @default(cuid())
+    rating    Int
+    review    String
+    userId    String
+    productId String
+    orderId   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, productId, orderId])
+}
+
+
+// =========================
+// ADDRESS
+// =========================
+
+model Address {
+    id        String   @id @default(cuid())
+    userId    String
+
+    name      String
+    email     String
+    street    String
+    city      String
+    state     String
+    zip       String
+    country   String
+    phone     String
+
+    createdAt DateTime @default(now())
+
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    orders    Order[]
+}
