@@ -3,10 +3,11 @@
 import { addToCart } from "@/lib/features/cart/cartSlice";
 import { StarIcon, TagIcon, EarthIcon, CreditCardIcon, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Counter from "./Counter";
 import { useDispatch, useSelector } from "react-redux";
+import { buttonPress, EASE, gsap, select, useGsap } from "@/lib/animations";
 
 const ProductDetails = ({ product }) => {
 
@@ -25,10 +26,26 @@ const ProductDetails = ({ product }) => {
     }
 
     const averageRating = product.rating.reduce((acc, item) => acc + item.rating, 0) / product.rating.length;
-    
+
+    const rootRef = useRef(null)
+
+    // Product-page entrance — media column then the information column.
+    useGsap((el) => {
+        const media = select(el, '[data-pd="media"]')
+        const info = select(el, '[data-pd="info"]')
+        const button = el.querySelector('[data-pd="add-to-cart"]')
+
+        const tl = gsap.timeline({ defaults: { ease: EASE.out, duration: 0.7 } })
+        tl.from(media, { y: 20, opacity: 0 })
+            .from(info, { y: 22, opacity: 0 }, '-=0.5')
+
+        const stopButton = buttonPress(button)
+        return () => stopButton && stopButton()
+    }, { scope: rootRef })
+
     return (
-        <div className="flex max-lg:flex-col gap-12">
-            <div className="flex max-sm:flex-col-reverse gap-3">
+        <div ref={rootRef} className="flex max-lg:flex-col gap-12">
+            <div data-pd="media" className="flex max-sm:flex-col-reverse gap-3">
                 <div className="flex sm:flex-col gap-3">
                     {product.images.map((image, index) => (
                         <div key={index} onClick={() => setMainImage(product.images[index])} className="bg-slate-100 flex items-center justify-center size-26 rounded-lg group cursor-pointer">
@@ -40,7 +57,7 @@ const ProductDetails = ({ product }) => {
                     <Image src={mainImage} alt="" width={250} height={250} />
                 </div>
             </div>
-            <div className="flex-1">
+            <div data-pd="info" className="flex-1">
                 <h1 className="text-3xl font-semibold text-slate-800">{product.name}</h1>
                 <div className='flex items-center mt-2'>
                     {Array(5).fill('').map((_, index) => (
@@ -65,7 +82,7 @@ const ProductDetails = ({ product }) => {
                             </div>
                         )
                     }
-                    <button onClick={() => !cart[productId] ? addToCartHandler() : router.push('/cart')} className="bg-brand text-white px-10 py-3 text-sm font-medium rounded hover:bg-brand-dark active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2">
+                    <button data-pd="add-to-cart" onClick={() => !cart[productId] ? addToCartHandler() : router.push('/cart')} className="bg-brand text-white px-10 py-3 text-sm font-medium rounded hover:bg-brand-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2">
                         {!cart[productId] ? 'Add to Cart' : 'View Cart'}
                     </button>
                 </div>

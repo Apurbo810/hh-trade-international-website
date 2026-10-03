@@ -1,11 +1,12 @@
 'use client'
 import ProductCard from "@/components/ProductCard"
 import { useParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { MailIcon, MapPinIcon } from "lucide-react"
 import Loading from "@/components/Loading"
 import Image from "next/image"
 import { dummyStoreData, productDummyData } from "@/assets/assets"
+import { revealCards, select, useGsap } from "@/lib/animations"
 
 export default function StoreShop() {
 
@@ -13,6 +14,13 @@ export default function StoreShop() {
     const [products, setProducts] = useState([])
     const [storeInfo, setStoreInfo] = useState(null)
     const [loading, setLoading] = useState(true)
+
+    const gridRef = useRef(null)
+
+    useGsap((el) => {
+        const cards = select(el, '[data-reveal="card"]')
+        revealCards(cards, { trigger: el, start: 'top 88%' })
+    }, { scope: gridRef, dependencies: [loading] })
 
     const fetchStoreData = async () => {
         setStoreInfo(dummyStoreData)
@@ -59,7 +67,7 @@ export default function StoreShop() {
             {/* Products */}
             <div className=" max-w-7xl mx-auto mb-40">
                 <h1 className="text-2xl mt-12">Shop <span className="text-slate-800 font-medium">Products</span></h1>
-                <div className="mt-5 grid grid-cols-2 sm:flex flex-wrap gap-6 xl:gap-12 mx-auto">
+                <div ref={gridRef} className="mt-5 grid grid-cols-2 sm:flex flex-wrap gap-6 xl:gap-12 mx-auto">
                     {products.map((product) => <ProductCard key={product.id} product={product} />)}
                 </div>
             </div>
