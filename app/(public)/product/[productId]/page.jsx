@@ -1,13 +1,13 @@
 'use client'
 import dynamic from "next/dynamic";
-import ProductDetails from "@/components/ProductDetails";
+import ProductDetails from "@/components/market/share/ProductDetails";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useLenis } from "lenis/react";
 
 // Lazily load the below-the-fold description/reviews section.
-const ProductDescription = dynamic(() => import("@/components/ProductDescription"), {
+const ProductDescription = dynamic(() => import("@/components/market/share/ProductDescription"), {
     ssr: false,
     loading: () => <div className="py-24" />,
 });

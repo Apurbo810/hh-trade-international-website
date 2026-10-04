@@ -1,6 +1,6 @@
 'use client'
 import React, { useRef } from 'react'
-import Title from './Title'
+import Title from './market/share/Title'
 import { ourSpecsData } from '@/assets/assets'
 import { hoverScale, revealCards, select, useGsap } from '@/lib/animations'
 

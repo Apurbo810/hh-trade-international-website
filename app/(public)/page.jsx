@@ -1,6 +1,9 @@
 'use client'
+
 import dynamic from "next/dynamic";
-import Hero from "@/components/Hero";
+import Hero from "@/components/market/home/Hero";
+import FeaturedShowcase from "@/components/market/home/FeaturedShowcase";
+import CategoriesMarquee from "@/components/market/home/CategoriesMarquee";
 
 // Below-the-fold sections are code-split and loaded lazily on the client.
 const SectionSkeleton = () => (
@@ -9,18 +12,53 @@ const SectionSkeleton = () => (
     </div>
 );
 
-const LatestProducts = dynamic(() => import("@/components/LatestProducts"), { ssr: false, loading: () => <SectionSkeleton /> });
-const BestSelling = dynamic(() => import("@/components/BestSelling"), { ssr: false, loading: () => <SectionSkeleton /> });
-const OurSpecs = dynamic(() => import("@/components/OurSpec"), { ssr: false, loading: () => <SectionSkeleton /> });
-const Newsletter = dynamic(() => import("@/components/Newsletter"), { ssr: false, loading: () => <SectionSkeleton /> });
+const LatestProducts = dynamic(
+    () => import("@/components/market/home/LatestProducts"),
+    {
+        ssr: false,
+        loading: () => <SectionSkeleton />,
+    }
+);
+
+const BestSelling = dynamic(
+    () => import("@/components/market/home/BestSelling"),
+    {
+        ssr: false,
+        loading: () => <SectionSkeleton />,
+    }
+);
+
+const OurSpecs = dynamic(
+    () => import("@/components/OurSpec"),
+    {
+        ssr: false,
+        loading: () => <SectionSkeleton />,
+    }
+);
+
+const Newsletter = dynamic(
+    () => import("@/components/market/home/Newsletter"),
+    {
+        ssr: false,
+        loading: () => <SectionSkeleton />,
+    }
+);
 
 export default function Home() {
     return (
         <div>
             <Hero />
+
+            <CategoriesMarquee />
+
             <LatestProducts />
+
+            <FeaturedShowcase />
+
             <BestSelling />
+
             <OurSpecs />
+
             <Newsletter />
         </div>
     );

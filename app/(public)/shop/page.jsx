@@ -1,50 +1,124 @@
 'use client'
-import { Suspense, useRef } from "react"
-import ProductCard from "@/components/ProductCard"
-import { MoveLeftIcon } from "lucide-react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useSelector } from "react-redux"
-import { revealCards, select, useGsap } from "@/lib/animations"
 
- function ShopContent() {
+import { Suspense, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useSelector } from 'react-redux'
 
-    // get query params ?search=abc
+import ShopHeader from '@/components/market/shop/ShopHeader'
+import ShopProductGrid from '@/components/market/shop/ShopProductGrid'
+import ShopPagination from '@/components/market/shop/ShopPagination'
+
+const PRODUCTS_PER_PAGE = 12
+
+function ShopContent() {
     const searchParams = useSearchParams()
-    const search = searchParams.get('search')
     const router = useRouter()
 
-    const products = useSelector(state => state.product.list)
+    const search = searchParams.get('search') || ''
 
-    const gridRef = useRef(null)
+    const products = useSelector(
+        (state) => state.product.list
+    )
 
-    useGsap((el) => {
-        const cards = select(el, '[data-reveal="card"]')
-        revealCards(cards, { trigger: el, start: 'top 88%' })
-    }, { scope: gridRef })
+    const [currentPage, setCurrentPage] = useState(1)
 
-    const filteredProducts = search
-        ? products.filter(product =>
-            product.name.toLowerCase().includes(search.toLowerCase())
+    const filteredProducts = useMemo(() => {
+        if (!search) return products
+
+        return products.filter((product) =>
+            product.name
+                .toLowerCase()
+                .includes(search.toLowerCase())
         )
-        : products;
+    }, [products, search])
+
+    const totalPages = Math.ceil(
+        filteredProducts.length / PRODUCTS_PER_PAGE
+    )
+
+    const safePage = Math.min(
+        currentPage,
+        Math.max(totalPages, 1)
+    )
+
+    const startIndex =
+        (safePage - 1) * PRODUCTS_PER_PAGE
+
+    const paginatedProducts =
+        filteredProducts.slice(
+            startIndex,
+            startIndex + PRODUCTS_PER_PAGE
+        )
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page)
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        })
+    }
+
+    const handleBack = () => {
+        setCurrentPage(1)
+        router.push('/shop')
+    }
 
     return (
-        <div className="min-h-[70vh] mx-6">
-            <div className=" max-w-7xl mx-auto">
-                <h1 onClick={() => router.push('/shop')} className="text-2xl text-slate-500 my-6 flex items-center gap-2 cursor-pointer"> {search && <MoveLeftIcon size={20} />}  All <span className="text-slate-700 font-medium">Products</span></h1>
-                <div ref={gridRef} className="grid grid-cols-2 sm:flex flex-wrap gap-6 xl:gap-12 mx-auto mb-32">
-                    {filteredProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+        <main className="min-h-[70vh] px-6">
+            <div className="mx-auto max-w-7xl py-8 sm:py-12">
+                <ShopHeader
+                    search={search}
+                    onBack={handleBack}
+                />
+
+                {/* Product count */}
+                <div className="mb-6 flex items-center justify-between">
+                    <p className="text-sm text-slate-500">
+                        Showing{' '}
+                        <span className="font-medium text-slate-700">
+                            {filteredProducts.length === 0
+                                ? 0
+                                : startIndex + 1}
+                            –
+                            {Math.min(
+                                startIndex +
+                                    paginatedProducts.length,
+                                filteredProducts.length
+                            )}
+                        </span>{' '}
+                        of{' '}
+                        <span className="font-medium text-slate-700">
+                            {filteredProducts.length}
+                        </span>{' '}
+                        products
+                    </p>
                 </div>
+
+                <ShopProductGrid
+                    products={paginatedProducts}
+                />
+
+                <ShopPagination
+                    currentPage={safePage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
             </div>
-        </div>
+        </main>
     )
 }
 
-
 export default function Shop() {
-  return (
-    <Suspense fallback={<div>Loading shop...</div>}>
-      <ShopContent />
-    </Suspense>
-  );
+    return (
+        <Suspense
+            fallback={
+                <div className="flex min-h-[60vh] items-center justify-center text-sm text-slate-500">
+                    Loading shop...
+                </div>
+            }
+        >
+            <ShopContent />
+        </Suspense>
+    )
 }

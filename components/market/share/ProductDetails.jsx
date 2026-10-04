@@ -5,7 +5,7 @@ import { StarIcon, TagIcon, EarthIcon, CreditCardIcon, UserIcon } from "lucide-r
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import Image from "next/image";
-import Counter from "./Counter";
+import Counter from "../../Counter";
 import { useDispatch, useSelector } from "react-redux";
 import { buttonPress, EASE, gsap, select, useGsap } from "@/lib/animations";
 

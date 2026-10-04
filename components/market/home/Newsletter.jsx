@@ -1,6 +1,6 @@
 'use client'
 import React, { useRef } from 'react'
-import Title from './Title'
+import Title from '../share/Title'
 import { buttonPress, revealScale, useGsap } from '@/lib/animations'
 
 const Newsletter = () => {
