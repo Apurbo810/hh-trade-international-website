@@ -54,6 +54,7 @@ const FeaturedShowcase = () => {
                 '[data-showcase="promo"]'
             )
 
+            // Make sure all required elements exist
             if (
                 !badge ||
                 !heading ||
@@ -65,10 +66,18 @@ const FeaturedShowcase = () => {
                 return
             }
 
+            /*
+             * Main entrance animation
+             */
             const tl = gsap.timeline({
                 defaults: {
                     ease: EASE.out,
                     duration: 0.7,
+                },
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 85%',
+                    once: true,
                 },
             })
 
@@ -121,16 +130,31 @@ const FeaturedShowcase = () => {
                     '-=0.62'
                 )
 
-            // Subtle floating effect for the main product image
-            const floatTween = gsap.to(image, {
-                y: -10,
-                duration: 2.6,
-                ease: 'sine.inOut',
-                repeat: -1,
-                yoyo: true,
-                delay: 1.7,
-            })
+            /*
+             * Only run the infinite floating animation on desktop.
+             *
+             * FeaturedShowcase is below the Hero, so there's no reason
+             * to keep an infinite animation running on mobile devices.
+             */
+            let floatTween = null
 
+            if (
+                typeof window !== 'undefined' &&
+                window.matchMedia('(min-width: 1024px)').matches
+            ) {
+                floatTween = gsap.to(image, {
+                    y: -10,
+                    duration: 2.6,
+                    ease: 'sine.inOut',
+                    repeat: -1,
+                    yoyo: true,
+                    delay: 1.7,
+                })
+            }
+
+            /*
+             * CTA hover / press animation
+             */
             const stopButton = buttonPress(cta, {
                 hoverScale: 1.03,
                 pressScale: 0.96,
@@ -138,7 +162,7 @@ const FeaturedShowcase = () => {
 
             return () => {
                 tl.kill()
-                floatTween.kill()
+                floatTween?.kill()
                 stopButton?.()
             }
         },
@@ -199,7 +223,7 @@ const FeaturedShowcase = () => {
                         </div>
 
                         {/* Heading */}
-                        <h1
+                        <h2
                             data-showcase="heading"
                             className="
                                 my-3
@@ -218,12 +242,18 @@ const FeaturedShowcase = () => {
                             Everything you need.
                             <br />
                             Prices you'll love.
-                        </h1>
+                        </h2>
 
                         {/* Price */}
                         <div
                             data-showcase="price"
-                            className="mt-4 text-sm font-medium text-slate-800 sm:mt-8"
+                            className="
+                                mt-4
+                                text-sm
+                                font-medium
+                                text-slate-800
+                                sm:mt-8
+                            "
                         >
                             <p>Starts from</p>
 
@@ -266,6 +296,7 @@ const FeaturedShowcase = () => {
                             relative
                             z-0
                             mt-auto
+                            h-auto
                             w-full
                             object-contain
                             sm:absolute
@@ -276,7 +307,13 @@ const FeaturedShowcase = () => {
                         "
                         src={assets.hero_model_img}
                         alt=""
-                        priority
+                        loading="lazy"
+                        sizes="
+                            (max-width: 639px) 100vw,
+                            (max-width: 1023px) 60vw,
+                            (max-width: 1279px) 45vw,
+                            576px
+                        "
                     />
                 </div>
 
@@ -294,6 +331,7 @@ const FeaturedShowcase = () => {
                         xl:flex-col
                     "
                 >
+
                     {/* Best Products */}
                     <div
                         data-showcase="promo"
@@ -337,9 +375,18 @@ const FeaturedShowcase = () => {
                         </div>
 
                         <Image
-                            className="w-35 object-contain transition-transform duration-500 group-hover:scale-105"
+                            className="
+                                h-auto
+                                w-35
+                                object-contain
+                                transition-transform
+                                duration-500
+                                group-hover:scale-105
+                            "
                             src={assets.hero_product_img1}
                             alt=""
+                            loading="lazy"
+                            sizes="140px"
                         />
                     </div>
 
@@ -386,9 +433,18 @@ const FeaturedShowcase = () => {
                         </div>
 
                         <Image
-                            className="w-35 object-contain transition-transform duration-500 group-hover:scale-105"
+                            className="
+                                h-auto
+                                w-35
+                                object-contain
+                                transition-transform
+                                duration-500
+                                group-hover:scale-105
+                            "
                             src={assets.hero_product_img2}
                             alt=""
+                            loading="lazy"
+                            sizes="140px"
                         />
                     </div>
                 </div>

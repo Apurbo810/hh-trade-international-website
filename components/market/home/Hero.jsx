@@ -2,11 +2,13 @@
 
 import Image from 'next/image'
 import { useRef, useState } from 'react'
+
 import { gsap, EASE, useGsap } from '@/lib/animations'
 
 import babyCare from '@/assets/hero_image/baby-care.jpg'
 import skincare from '@/assets/hero_image/skincare.jpg'
 import fragranceTea from '@/assets/hero_image/fragrance-tea.jpg'
+
 const slides = [
     {
         id: 1,
@@ -52,16 +54,17 @@ const Hero = () => {
 
     useGsap(
         (el) => {
+            if (!el) return
+
             const content = contentRef.current
 
             if (!content) return
 
-            // The right-hand image and the floating badge live inside a
-            // container that is `hidden` below the `lg` breakpoint, so on phones
-            // they have `display: none`. Animating a hidden node does nothing
-            // visible but keeps an infinite tween running, so only set these up
-            // on the desktop layout. `matchMedia` re-evaluates on resize /
-            // orientation change.
+            /*
+             * Desktop-only image animations.
+             * The desktop image is hidden below lg,
+             * so don't run an infinite animation on mobile.
+             */
             const mm = gsap.matchMedia()
 
             mm.add('(min-width: 1024px)', () => {
@@ -115,10 +118,12 @@ const Hero = () => {
                     delay: 1,
                 })
 
-                return () => floatTween.kill()
+                return () => {
+                    floatTween.kill()
+                }
             })
 
-            // Content entrance runs on every viewport.
+            // Content entrance
             gsap.fromTo(
                 content,
                 {
@@ -134,15 +139,18 @@ const Hero = () => {
                 }
             )
 
-            // Automatically change slide after 3 seconds. The fade-out targets
-            // are collected defensively so a missing image is never handed to
-            // GSAP (on mobile it is `display: none`).
-            const fadeTargets = [content]
-            if (imageRef.current) fadeTargets.push(imageRef.current)
-
+            /*
+             * Automatically change slide after 3 seconds.
+             */
             const timer = setTimeout(() => {
                 const nextIndex =
                     (activeIndex + 1) % slides.length
+
+                const fadeTargets = [content]
+
+                if (imageRef.current) {
+                    fadeTargets.push(imageRef.current)
+                }
 
                 gsap.timeline({
                     onComplete: () => {
@@ -173,6 +181,10 @@ const Hero = () => {
         const image = imageRef.current
         const content = contentRef.current
 
+        /*
+         * On mobile the desktop image is hidden.
+         * In that case simply change the slide.
+         */
         if (!image || !content) {
             setActiveIndex(index)
             return
@@ -186,15 +198,12 @@ const Hero = () => {
             },
         })
 
-        tl.to(
-            [content, image],
-            {
-                opacity: 0,
-                x: -20,
-                duration: 0.3,
-                ease: EASE.inOut,
-            }
-        )
+        tl.to([content, image], {
+            opacity: 0,
+            x: -20,
+            duration: 0.3,
+            ease: EASE.inOut,
+        })
     }
 
     return (
@@ -394,7 +403,7 @@ const Hero = () => {
                         </div>
                     </div>
 
-                    {/* RIGHT IMAGE */}
+                    {/* RIGHT IMAGE - DESKTOP */}
                     <div
                         ref={imageRef}
                         className="
@@ -411,8 +420,8 @@ const Hero = () => {
                                 src={activeSlide.image}
                                 alt={activeSlide.title}
                                 fill
-                                priority
-                                sizes="(max-width: 1024px) 100vw, 58vw"
+                                loading="eager"
+                                sizes="(min-width: 1024px) 58vw, 100vw"
                                 className="
                                     object-cover
                                     object-center
@@ -494,7 +503,7 @@ const Hero = () => {
                                     alt=""
                                     width={110}
                                     height={80}
-                                    className="h-20 w-28 object-cover"
+                                    className="block h-[80px] w-[110px] object-cover"
                                 />
                             </div>
 
@@ -514,7 +523,7 @@ const Hero = () => {
                                     alt=""
                                     width={130}
                                     height={95}
-                                    className="h-24 w-32 object-cover"
+                                    className="block h-[95px] w-[130px] object-cover"
                                 />
                             </div>
                         </div>
@@ -534,7 +543,8 @@ const Hero = () => {
                         src={activeSlide.image}
                         alt={activeSlide.title}
                         fill
-                        sizes="100vw"
+                        loading="eager"
+                        sizes="calc(100vw - 2rem)"
                         className="object-cover"
                     />
 
