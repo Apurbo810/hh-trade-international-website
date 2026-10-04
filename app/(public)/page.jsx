@@ -50,13 +50,13 @@ export default function Home() {
         <div>
            {/* <Hero />
 
-            <CategoriesMarquee />
+            <CategoriesMarquee />*/}
 
-            <LatestProducts />*/}
+            <LatestProducts />
 
-            <FeaturedShowcase />
+           {/* <FeaturedShowcase />
 
-            {/*<BestSelling />
+            <BestSelling />
 
             <OurBrands />
 
