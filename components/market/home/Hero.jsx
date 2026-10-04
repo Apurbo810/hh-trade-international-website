@@ -52,29 +52,73 @@ const Hero = () => {
 
     useGsap(
         (el) => {
-            const image = imageRef.current
             const content = contentRef.current
-            const floating = floatingRef.current
 
-            if (!image || !content) return
+            if (!content) return
 
-            // Initial animation
-            gsap.fromTo(
-                image,
-                {
-                    opacity: 0,
-                    scale: 1.06,
-                    x: 30,
-                },
-                {
-                    opacity: 1,
-                    scale: 1,
-                    x: 0,
-                    duration: 0.8,
-                    ease: EASE.out,
+            // The right-hand image and the floating badge live inside a
+            // container that is `hidden` below the `lg` breakpoint, so on phones
+            // they have `display: none`. Animating a hidden node does nothing
+            // visible but keeps an infinite tween running, so only set these up
+            // on the desktop layout. `matchMedia` re-evaluates on resize /
+            // orientation change.
+            const mm = gsap.matchMedia()
+
+            mm.add('(min-width: 1024px)', () => {
+                const image = imageRef.current
+                const floating = floatingRef.current
+
+                if (!image) return
+
+                gsap.fromTo(
+                    image,
+                    {
+                        opacity: 0,
+                        scale: 1.06,
+                        x: 30,
+                    },
+                    {
+                        opacity: 1,
+                        scale: 1,
+                        x: 0,
+                        duration: 0.8,
+                        ease: EASE.out,
+                    }
+                )
+
+                if (floating) {
+                    gsap.fromTo(
+                        floating,
+                        {
+                            opacity: 0,
+                            scale: 0.85,
+                            y: 20,
+                        },
+                        {
+                            opacity: 1,
+                            scale: 1,
+                            y: 0,
+                            duration: 0.7,
+                            delay: 0.2,
+                            ease: 'back.out(1.5)',
+                        }
+                    )
                 }
-            )
 
+                // Very subtle floating animation
+                const floatTween = gsap.to(image, {
+                    y: -8,
+                    duration: 2.5,
+                    ease: 'sine.inOut',
+                    repeat: -1,
+                    yoyo: true,
+                    delay: 1,
+                })
+
+                return () => floatTween.kill()
+            })
+
+            // Content entrance runs on every viewport.
             gsap.fromTo(
                 content,
                 {
@@ -90,61 +134,31 @@ const Hero = () => {
                 }
             )
 
-            if (floating) {
-                gsap.fromTo(
-                    floating,
-                    {
-                        opacity: 0,
-                        scale: 0.85,
-                        y: 20,
-                    },
-                    {
-                        opacity: 1,
-                        scale: 1,
-                        y: 0,
-                        duration: 0.7,
-                        delay: 0.2,
-                        ease: 'back.out(1.5)',
-                    }
-                )
-            }
+            // Automatically change slide after 3 seconds. The fade-out targets
+            // are collected defensively so a missing image is never handed to
+            // GSAP (on mobile it is `display: none`).
+            const fadeTargets = [content]
+            if (imageRef.current) fadeTargets.push(imageRef.current)
 
-            // Very subtle floating animation
-            const floatTween = gsap.to(image, {
-                y: -8,
-                duration: 2.5,
-                ease: 'sine.inOut',
-                repeat: -1,
-                yoyo: true,
-                delay: 1,
-            })
-
-            // Automatically change slide after 3 seconds
             const timer = setTimeout(() => {
                 const nextIndex =
                     (activeIndex + 1) % slides.length
 
-                const transition = gsap.timeline({
+                gsap.timeline({
                     onComplete: () => {
                         setActiveIndex(nextIndex)
                     },
+                }).to(fadeTargets, {
+                    opacity: 0,
+                    x: -25,
+                    duration: 0.35,
+                    ease: EASE.inOut,
                 })
-
-                transition
-                    .to(
-                        [content, image],
-                        {
-                            opacity: 0,
-                            x: -25,
-                            duration: 0.35,
-                            ease: EASE.inOut,
-                        }
-                    )
             }, 3000)
 
             return () => {
                 clearTimeout(timer)
-                floatTween.kill()
+                mm.revert()
             }
         },
         {

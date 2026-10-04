@@ -52,9 +52,12 @@ const CategoriesMarquee = () => {
 
             if (!items.length) return
 
-            // Calculate the width of one complete category set
-            const setWidth =
-                track.scrollWidth / 4
+            // Calculate the width of one complete category set. Bail out if the
+            // track has not been laid out yet (width 0 or NaN) so GSAP never
+            // receives an invalid animation value.
+            const setWidth = track.scrollWidth / 4
+
+            if (!Number.isFinite(setWidth) || setWidth <= 0) return
 
             // Continuous left-to-right movement
             const tween = gsap.to(track, {

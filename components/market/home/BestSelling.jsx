@@ -6,7 +6,6 @@ import ProductCard from '../share/ProductCard'
 import { useSelector } from 'react-redux'
 import {
     gsap,
-    ScrollTrigger,
     buttonPress,
     select,
     useGsap,
@@ -19,12 +18,21 @@ const BestSelling = () => {
 
     const rootRef = useRef(null)
 
-    const bestSellingProducts = products
+    // `rating` is expected to be an array of reviews, but a product coming from
+    // the API / seller dashboard can be missing it entirely. Reading
+    // `rating.length` unguarded throws a TypeError during render and takes down
+    // the whole page, so count safely instead.
+    const ratingCount = (product) => {
+        const rating = product && product.rating
+
+        return Array.isArray(rating) ? rating.length : 0
+    }
+
+    const productList = Array.isArray(products) ? products : []
+
+    const bestSellingProducts = productList
         .slice()
-        .sort(
-            (a, b) =>
-                b.rating.length - a.rating.length
-        )
+        .sort((a, b) => ratingCount(b) - ratingCount(a))
         .slice(0, displayQuantity)
 
     useGsap(
@@ -88,8 +96,6 @@ const BestSelling = () => {
                 }
             )
 
-            ScrollTrigger.refresh()
-
             return () => {
                 cleanupButton?.()
             }
@@ -105,7 +111,7 @@ const BestSelling = () => {
             {/* Header */}
             <Title
                 title="Best Selling"
-                description={`Showing ${bestSellingProducts.length} of ${products.length} products`}
+                description={`Showing ${bestSellingProducts.length} of ${productList.length} products`}
                 href="/shop"
             />
 

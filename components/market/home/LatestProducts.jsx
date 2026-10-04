@@ -7,7 +7,6 @@ import ProductCard from '../share/ProductCard'
 import { useSelector } from 'react-redux'
 import {
     gsap,
-    ScrollTrigger,
     useGsap,
     buttonPress,
 } from '@/lib/animations'
@@ -20,13 +19,19 @@ const LatestProducts = () => {
     const sliderRef = useRef(null)
     const rootRef = useRef(null)
 
-    const latestProducts = products
+    const productList = Array.isArray(products) ? products : []
+
+    // Invalid / missing dates produce NaN, which makes the comparison
+    // unpredictable. Fall back to 0 so the sort is always well defined.
+    const toTime = (value) => {
+        const time = new Date(value).getTime()
+
+        return Number.isFinite(time) ? time : 0
+    }
+
+    const latestProducts = productList
         .slice()
-        .sort(
-            (a, b) =>
-                new Date(b.createdAt) -
-                new Date(a.createdAt)
-        )
+        .sort((a, b) => toTime(b.createdAt) - toTime(a.createdAt))
         .slice(0, displayQuantity)
 
     useGsap((el) => {
@@ -113,8 +118,6 @@ const LatestProducts = () => {
             duration: 0.2,
         })
 
-        ScrollTrigger.refresh()
-
         return () => {
             cleanupButtons?.()
         }
@@ -189,7 +192,7 @@ const LatestProducts = () => {
             >
                 <Title
                     title="Latest Products"
-                    description={`Showing ${latestProducts.length} of ${products.length} products`}
+                    description={`Showing ${latestProducts.length} of ${productList.length} products`}
                     href="/shop"
                 />
 
