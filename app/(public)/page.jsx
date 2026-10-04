@@ -48,9 +48,9 @@ const Newsletter = dynamic(
 export default function Home() {
     return (
         <div>
-           {/* <Hero />
+            <Hero />
 
-            <CategoriesMarquee />*/}
+            <CategoriesMarquee />
 
             <LatestProducts />
 
@@ -58,11 +58,11 @@ export default function Home() {
 
             <BestSelling />
 
-           {/* <OurBrands />
+            <OurBrands />
 
             <OurSpecs />
 
-            <Newsletter /> */}
+            <Newsletter /> 
         </div>
     );
 }
