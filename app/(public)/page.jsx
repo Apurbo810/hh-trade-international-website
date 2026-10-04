@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Hero from "@/components/market/home/Hero";
 import FeaturedShowcase from "@/components/market/home/FeaturedShowcase";
 import CategoriesMarquee from "@/components/market/home/CategoriesMarquee";
+import OurBrands from "@/components/market/home/OurBrands";
 
 // Below-the-fold sections are code-split and loaded lazily on the client.
 const SectionSkeleton = () => (
@@ -56,6 +57,8 @@ export default function Home() {
             <FeaturedShowcase />
 
             <BestSelling />
+
+            <OurBrands />
 
             <OurSpecs />
 
