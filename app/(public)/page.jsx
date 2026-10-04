@@ -54,9 +54,9 @@ export default function Home() {
 
             <LatestProducts />
 
-            <FeaturedShowcase />
+            <FeaturedShowcase />*/}
 
-            <BestSelling />*/}
+            <BestSelling />
 
             <OurBrands />
 
