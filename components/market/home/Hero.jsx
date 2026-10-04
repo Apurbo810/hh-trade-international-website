@@ -420,8 +420,8 @@ const Hero = () => {
                                 src={activeSlide.image}
                                 alt={activeSlide.title}
                                 fill
-                                loading="eager"
-                                sizes="(min-width: 1024px) 58vw, 100vw"
+                                loading="lazy"
+                                sizes="58vw"
                                 className="
                                     object-cover
                                     object-center
