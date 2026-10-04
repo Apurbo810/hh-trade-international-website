@@ -56,13 +56,13 @@ export default function Home() {
 
             <FeaturedShowcase />
 
-            <BestSelling />
+            <BestSelling />*/}
 
             <OurBrands />
 
             <OurSpecs />
 
-            <Newsletter /> */}
+            <Newsletter /> 
         </div>
     );
 }
