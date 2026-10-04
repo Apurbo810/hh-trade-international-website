@@ -50,7 +50,7 @@ export default function Home() {
         <div>
             <Hero />
 
-            <CategoriesMarquee />
+           {/* <CategoriesMarquee />
 
             <LatestProducts />
 
@@ -62,7 +62,7 @@ export default function Home() {
 
             <OurSpecs />
 
-            <Newsletter />
+            <Newsletter /> */}
         </div>
     );
 }
