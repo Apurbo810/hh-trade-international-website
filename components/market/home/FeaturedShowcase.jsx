@@ -1,9 +1,10 @@
 'use client'
 
-import { assets } from '@/assets/assets'
+import { useRef } from 'react'
 import { ArrowRightIcon, ChevronRightIcon } from 'lucide-react'
 import Image from 'next/image'
-import React from 'react'
+
+import { assets } from '@/assets/assets'
 
 import {
     buttonPress,
@@ -17,89 +18,134 @@ const FeaturedShowcase = () => {
     const currency =
         process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || '$'
 
-    const rootRef = useGsap((el) => {
-        const badge = select(el, '[data-showcase="badge"]')
-        const heading = select(el, '[data-showcase="heading"]')
-        const price = select(el, '[data-showcase="price"]')
-        const cta = select(el, '[data-showcase="cta"]')
-        const image = select(el, '[data-showcase="image"]')
-        const promos = select(el, '[data-showcase="promo"]')
+    const rootRef = useRef(null)
 
-        const tl = gsap.timeline({
-            defaults: {
-                ease: EASE.out,
-                duration: 0.7,
-            },
-        })
+    useGsap(
+        (el) => {
+            if (!el) return
 
-        tl.from(badge, {
-            y: 14,
-            opacity: 0,
-            duration: 0.5,
-        })
-            .from(
-                heading,
-                {
-                    y: 26,
-                    opacity: 0,
-                },
-                '-=0.32'
-            )
-            .from(
-                price,
-                {
-                    y: 18,
-                    opacity: 0,
-                },
-                '-=0.42'
-            )
-            .from(
-                cta,
-                {
-                    y: 14,
-                    opacity: 0,
-                },
-                '-=0.45'
-            )
-            .from(
-                image,
-                {
-                    y: 28,
-                    opacity: 0,
-                    scale: 0.97,
-                    duration: 0.9,
-                },
-                '-=0.7'
-            )
-            .from(
-                promos,
-                {
-                    y: 26,
-                    opacity: 0,
-                    stagger: 0.12,
-                },
-                '-=0.62'
+            const badge = select(
+                el,
+                '[data-showcase="badge"]'
             )
 
-        // Subtle floating effect for the main product image
-        gsap.to(image, {
-            y: -10,
-            duration: 2.6,
-            ease: 'sine.inOut',
-            repeat: -1,
-            yoyo: true,
-            delay: 1.7,
-        })
+            const heading = select(
+                el,
+                '[data-showcase="heading"]'
+            )
 
-        const stopButton = buttonPress(cta, {
-            hoverScale: 1.03,
-            pressScale: 0.96,
-        })
+            const price = select(
+                el,
+                '[data-showcase="price"]'
+            )
 
-        return () => {
-            stopButton?.()
+            const cta = select(
+                el,
+                '[data-showcase="cta"]'
+            )
+
+            const image = select(
+                el,
+                '[data-showcase="image"]'
+            )
+
+            const promos = select(
+                el,
+                '[data-showcase="promo"]'
+            )
+
+            if (
+                !badge ||
+                !heading ||
+                !price ||
+                !cta ||
+                !image ||
+                !promos
+            ) {
+                return
+            }
+
+            const tl = gsap.timeline({
+                defaults: {
+                    ease: EASE.out,
+                    duration: 0.7,
+                },
+            })
+
+            tl.from(badge, {
+                y: 14,
+                opacity: 0,
+                duration: 0.5,
+            })
+                .from(
+                    heading,
+                    {
+                        y: 26,
+                        opacity: 0,
+                    },
+                    '-=0.32'
+                )
+                .from(
+                    price,
+                    {
+                        y: 18,
+                        opacity: 0,
+                    },
+                    '-=0.42'
+                )
+                .from(
+                    cta,
+                    {
+                        y: 14,
+                        opacity: 0,
+                    },
+                    '-=0.45'
+                )
+                .from(
+                    image,
+                    {
+                        y: 28,
+                        opacity: 0,
+                        scale: 0.97,
+                        duration: 0.9,
+                    },
+                    '-=0.7'
+                )
+                .from(
+                    promos,
+                    {
+                        y: 26,
+                        opacity: 0,
+                        stagger: 0.12,
+                    },
+                    '-=0.62'
+                )
+
+            // Subtle floating effect for the main product image
+            const floatTween = gsap.to(image, {
+                y: -10,
+                duration: 2.6,
+                ease: 'sine.inOut',
+                repeat: -1,
+                yoyo: true,
+                delay: 1.7,
+            })
+
+            const stopButton = buttonPress(cta, {
+                hoverScale: 1.03,
+                pressScale: 0.96,
+            })
+
+            return () => {
+                tl.kill()
+                floatTween.kill()
+                stopButton?.()
+            }
+        },
+        {
+            scope: rootRef,
         }
-    })
+    )
 
     return (
         <section
@@ -347,7 +393,6 @@ const FeaturedShowcase = () => {
                     </div>
                 </div>
             </div>
-
         </section>
     )
 }
